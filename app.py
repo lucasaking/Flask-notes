@@ -71,7 +71,7 @@ def login():
 
         if user:
             session["user_id"] = user.id  # keep logged in
-            return redirect("/secret")
+            return redirect(f"/users/{user.username}")
 
         else:
             form.username.errors = ["Bad name/password"]
@@ -152,7 +152,39 @@ def show_notes_form(username):
         return render_template("notes_form.html", form=form)
 
 
-# @app.route("/notes/<username>/notes/update")
-# def update_notes_form():
+@app.route("/users/<username>/notes/<note_id>/update", methods=["GET", "POST"])
+def update_notes_form(username, note_id):
+
+    user = User.query.get_or_404(session["user_id"])
+    note = Note.query.get_or_404(note_id)
+
+    form = NotesForm(obj=note)
+
+    if form.validate_on_submit():
+        note.title = form.title.data
+        note.content = form.content.data
+        db.session.commit()
+        flash(f"Note updated!")
+        return redirect(f"/users/{user.username}")
+
+    else:
+        return render_template("notes_form.html", form=form)
+
+
+# @app.route("/notes/<username>/notes/<note-id>/delete", methods=["GET", "POST"])
+# def delete_note(username, note_id):
+#     if "user_id" not in session:
+#         flash("You must be logged in to change a note!")
+#         return redirect("/")
+    
+#     else:
+#         user = User.query.get_or_404(session["user_id"])
+#         note = Note.query.get_or_404(note_id)
+        
+#         db.session.delete(note)
+#         db.session.commit()
+#         session.pop("note_id")
+#         flash(f"Note has been deleted")
+#         return redirect("/users/<username>")
 
 
