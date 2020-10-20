@@ -38,15 +38,18 @@ class User(db.Model):
     password = db.Column(db.Text,
                          nullable=False)
 
+    notes = db.relationship('Note')
+
+
     # start_register
     @classmethod
-    def register(cls, username, pwd):
+    def register(cls, username, pwd, first_name, last_name, email):
         """Register user w/hashed password & return user."""
 
         hashed = bcrypt.generate_password_hash(pwd).decode('utf8')
 
         # return instance of user w/username and hashed pwd
-        return cls(username=username, password=hashed)
+        return cls(username=username, password=hashed, first_name=first_name, last_name=last_name, email=email)
 
     # end_register
 
@@ -66,3 +69,22 @@ class User(db.Model):
         else:
             return False
     # end_authenticate
+
+class Note(db.Model):
+
+    __tablename__ = "notes"
+    
+    id = db.Column(db.Integer,
+                   primary_key=True,
+                   autoincrement=True)
+
+    title = db.Column(db.String(50),
+                      nullable=True)
+
+    content = db.Column(db.Text,
+                        nullable=True)
+
+    owner = db.Column(db.String,
+                      db.ForeignKey("users.username"))
+    
+    user = db.relationship('User')
