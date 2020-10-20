@@ -4,7 +4,7 @@ from models import connect_db, db, User
 from forms import RegisterForm, LoginForm
 
 app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgres:///hashing_login"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgres:///user_login"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = True
 app.config["SECRET_KEY"] = "donttell"
@@ -29,10 +29,13 @@ def register():
     form = RegisterForm()
 
     if form.validate_on_submit():
-        name = form.username.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+        username = form.username.data
         pwd = form.password.data
+        email = form.email.data
 
-        user = User.register(name, pwd)
+        user = User.register(username, pwd)
         db.session.add(user)
         db.session.commit()
 

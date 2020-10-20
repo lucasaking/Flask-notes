@@ -1,5 +1,8 @@
 <html>
 <head>
+  <title>
+    Notes &ndash; {% block title %}{% endblock %}
+  </title>
   <link rel="stylesheet" href="https://bootswatch.com/4/united/bootstrap.css">
 
 </head>
@@ -14,6 +17,8 @@
   {% for msg in get_flashed_messages() %}
     <div class="alert alert-danger">{{ msg }}</div>
   {% endfor %}
+
+  <h1>{% block header %}{% endblock %}</h1>
 
   {% block content %}
   {% endblock %}
