@@ -20,14 +20,13 @@ toolbar = DebugToolbarExtension(app)
 @app.route("/")
 def homepage():
     """Show homepage with links to site areas."""
-    
+
     if "user_id" not in session:
         return render_template("index.html")
-    
+
     else:
         user = User.query.get_or_404(session["user_id"])
         return render_template("index.html", user=user)
-    
 
 
 @app.route("/register", methods=["GET", "POST"])
@@ -84,9 +83,11 @@ def login():
 
 @app.route("/users/<username>")
 def show_user_details(username):
-    """Example hidden page for logged-in users only."""
+    """Show users username and details."""
 
-    if "user_id" not in session:
+    user = User.query.get_or_404(session["user_id"])
+
+    if "user_id" not in session or user.username != username:
         flash("You must be logged in to view!")
         return redirect("/")
 
@@ -96,7 +97,6 @@ def show_user_details(username):
         # raise Unauthorized()
 
     else:
-        user = User.query.get_or_404(session["user_id"])
         return render_template("user_details.html", user=user)
 
 
@@ -105,7 +105,7 @@ def delete_user(username):
     if "user_id" not in session:
         flash("You must be logged in to view!")
         return redirect("/")
-    
+ 
     else:
         user = User.query.get_or_404(session["user_id"])
         db.session.delete(user)
@@ -129,7 +129,6 @@ def show_notes_form(username):
     """ Display a form for user to add notes """
 
     form = NotesForm()
-    
 
     if "user_id" not in session:
         flash("You must be logged in to view!")
@@ -160,6 +159,10 @@ def update_notes_form(username, note_id):
 
     form = NotesForm(obj=note)
 
+    if "user_id" not in session:
+        flash("You must be logged in to view!")
+        return redirect("/")
+
     if form.validate_on_submit():
         note.title = form.title.data
         note.content = form.content.data
@@ -171,20 +174,19 @@ def update_notes_form(username, note_id):
         return render_template("notes_form.html", form=form)
 
 
-# @app.route("/notes/<username>/notes/<note-id>/delete", methods=["GET", "POST"])
-# def delete_note(username, note_id):
-#     if "user_id" not in session:
-#         flash("You must be logged in to change a note!")
-#         return redirect("/")
-    
-#     else:
-#         user = User.query.get_or_404(session["user_id"])
-#         note = Note.query.get_or_404(note_id)
-        
-#         db.session.delete(note)
-#         db.session.commit()
-#         session.pop("note_id")
-#         flash(f"Note has been deleted")
-#         return redirect("/users/<username>")
+@app.route("/users/<username>/notes/<note_id>/delete", methods=["GET", "POST"])
+def delete_note(username, note_id):
 
+    if "user_id" not in session:
+        flash("You must be logged in to change a note!")
+        return redirect("/")
+
+    else:
+        user = User.query.get_or_404(session["user_id"])
+        note = Note.query.get_or_404(note_id)
+
+        db.session.delete(note)
+        db.session.commit()
+        flash(f"Note has been deleted")
+        return redirect(f"/users/{user.username}")
 

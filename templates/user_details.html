@@ -16,6 +16,7 @@
 
   <div class="list-group">
 
+
     {% for note in user.notes %}
         <a href="/users/{{ user.username }}/notes/{{ note.id }}/update" class="list-group-item list-group-item-action flex-column align-items-start">
             <div class="d-flex w-100 justify-content-between">
@@ -23,11 +24,15 @@
             </div>
             <p class="mb-1">{{ note.content }}</p>
             <div>
-                <form action="">
-
+                <form action="/users/{{ user.username }}/notes/{{ note.id }}/delete" method="POST" class="mt-2">
+                    <button type="submit" class="btn btn-danger btn-sm rounded">Delete Note</button>
                 </form>
             </div>
         </a>
     {% endfor %}
-</div>
+  </div>
+
+  <a href="/users/{{ user.username }}/notes/add" class="btn btn-secondary mt-4 rounded" role="button">Add Note</a>
+
+
 {% endblock %}
